@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>CloudUnmask - Reveal Cloud Server IP</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #f8fafc;
+      margin: 0;
+      padding: 40px;
+      color: #1f2937;
+    }
+
+    .container {
+      max-width: 850px;
+      margin: auto;
+    }
+
+    h1 {
+      text-align: center;
+      color: #111827;
+      margin-bottom: 30px;
+    }
+
+    form {
+      background: white;
+      padding: 24px;
+      border-radius: 12px;
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.06);
+      margin-bottom: 40px;
+    }
+
+    input[type="text"] {
+      width: 100%;
+      padding: 14px;
+      font-size: 16px;
+      margin-bottom: 20px;
+      border: 1px solid #d1d5db;
+      border-radius: 8px;
+    }
+
+    button {
+      background-color: #3b82f6;
+      color: white;
+      padding: 12px 24px;
+      font-size: 16px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    button:hover {
+      background-color: #2563eb;
+    }
+
+    h2, h3 {
+      color: #1e40af;
+      margin-top: 30px;
+    }
+
+    .result-block {
+      background: white;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+      margin-bottom: 30px;
+    }
+
+    .label {
+      font-weight: bold;
+      color: #111827;
+    }
+
+    pre {
+      background-color: #f3f4f6;
+      padding: 15px;
+      border-radius: 8px;
+      overflow-x: auto;
+      white-space: pre-wrap;
+    }
+
+    ul {
+      list-style-type: disc;
+      padding-left: 20px;
+    }
+
+    li {
+      padding: 4px 0;
+    }
+
+    footer {
+      text-align: center;
+      margin-top: 40px;
+      font-size: 14px;
+      color: #6b7280;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🌐 CloudUnmask: Reveal Hidden Server IP</h1>
+
+    <form method="POST">
+      <input type="text" name="domain" placeholder="Enter domain (e.g. cloudflare-protected-site.com)" required>
+      <button type="submit">Unmask</button>
+    </form>
+
+    {% if result %}
+      <div class="result-block">
+        <h2>Results for <span class="label">{{ result.domain }}</span></h2>
+        <p><span class="label">Real IP:</span> {{ result.real_ip }}</p>
+        <p><span class="label">Confidence:</span> {{ result.confidence }}%</p>
+        <p><span class="label">Cloud Provider:</span> {{ result.details.cdn_provider }}</p>
+      </div>
+
+      <div class="result-block">
+        <h3>🔍 DNS Records</h3>
+        <pre>{{ result.details.dns_records | tojson(indent=2) }}</pre>
+      </div>
+
+      <div class="result-block">
+        <h3>🔒 SSL Certificate Subdomains</h3>
+        <ul>
+          {% for sub in result.details.ssl_cert_domains %}
+            <li>{{ sub }}</li>
+          {% endfor %}
+        </ul>
+      </div>
+
+      <div class="result-block">
+        <h3>📄 WHOIS Info</h3>
+        <pre>{{ result.details.whois | tojson(indent=2) }}</pre>
+      </div>
+
+      <div class="result-block">
+        <h3>🛰️ Traceroute Hops</h3>
+        <ul>
+          {% for ip in result.details.traceroute %}
+            <li>{{ ip }} — {{ result.details.geo_trace[ip] }}</li>
+          {% endfor %}
+        </ul>
+      </div>
+    {% endif %}
+
+    <footer>
+      &copy; 2025 CloudUnmask · OSINT + AI tool for cybercrime investigations
+    </footer>
+  </div>
+</body>
+</html>
